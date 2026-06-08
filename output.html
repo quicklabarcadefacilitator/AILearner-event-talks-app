@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Talks 2026</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+header p {
+    font-size: 1.1rem;
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.filters {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.filters label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.filters select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.talk-card, .break-card {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.talk-card h2, .break-card h2 {
+    color: #0056b3;
+    margin-top: 0;
+    font-size: 1.5rem;
+}
+
+.break-card h2 {
+    color: #d9534f; /* Red for breaks */
+}
+
+.talk-time, .break-time {
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.talk-speakers {
+    font-style: italic;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.talk-categories {
+    font-size: 0.9em;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.talk-description {
+    font-size: 0.95em;
+    flex-grow: 1; /* Allows description to take available space */
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    background-color: #333;
+    color: #fff;
+    font-size: 0.9em;
+}
+
+@media (max-width: 768px) {
+    .schedule-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tech Talks 2026 - Schedule</h1>
+        <p>A day of insightful technical talks.</p>
+    </header>
+
+    <main>
+        <section class="filters">
+            <label for="category-filter">Filter by Category:</label>
+            <select id="category-filter">
+                <option value="all">All Categories</option>
+            </select>
+        </section>
+
+        <section id="schedule" class="schedule-grid">
+            <!-- Talks will be rendered here by JavaScript -->
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Tech Talks. All rights reserved.</p>
+    </footer>
+
+<script>
+const talksData = [
+    {
+        id: 'talk1',
+        title: "The Future of Serverless Architectures",
+        speakers: ["Dr. Alex W."],
+        category: ["Cloud Computing", "Architecture"],
+        duration: 60, // minutes
+        description: "Explore the latest trends and best practices in serverless computing, focusing on cost optimization and scalability."
+    },
+    {
+        id: 'talk2',
+        title: "Mastering TypeScript for Large Scale Applications",
+        speakers: ["Ms. Jordan S."],
+        category: ["Web Development", "Programming Languages"],
+        duration: 60,
+        description: "Dive deep into advanced TypeScript features that can help you build robust and maintainable applications."
+    },
+    {
+        id: 'talk3',
+        title: "Introduction to Quantum Machine Learning",
+        speakers: ["Dr. Evelyn K.", "Mr. Chris P."],
+        category: ["AI", "Machine Learning", "Quantum Computing"],
+        duration: 60,
+        description: "An accessible introduction to the exciting field of quantum machine learning and its potential impact."
+    },
+    {
+        id: 'talk4',
+        title: "DevOps with Kubernetes: A Practical Guide",
+        speakers: ["Mr. Michael B."],
+        category: ["DevOps", "Cloud Computing"],
+        duration: 60,
+        description: "Learn how to effectively deploy, manage, and scale your applications using Kubernetes in a DevOps pipeline."
+    },
+    {
+        id: 'talk5',
+        title: "Building Real-time Applications with WebSockets",
+        speakers: ["Ms. Olivia R."],
+        category: ["Web Development", "Networking"],
+        duration: 60,
+        description: "Discover how to implement real-time communication in your web applications using WebSockets."
+    },
+    {
+        id: 'talk6',
+        title: "Ethical AI: Principles and Practices",
+        speakers: ["Dr. Benjamin H."],
+        category: ["AI", "Ethics"],
+        duration: 60,
+        description: "Discussing the ethical considerations in AI development and deployment, and how to build responsible AI systems."
+    }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    const scheduleContainer = document.getElementById('schedule');
+    const categoryFilter = document.getElementById('category-filter');
+
+    // Populate category filter
+    const allCategories = new Set();
+    talksData.forEach(talk => {
+        talk.category.forEach(cat => allCategories.add(cat));
+    });
+    Array.from(allCategories).sort().forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categoryFilter.appendChild(option);
+    });
+
+    function formatTime(date) {
+        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function renderSchedule(filteredTalks) {
+        scheduleContainer.innerHTML = ''; // Clear previous schedule
+
+        let currentTime = new Date();
+        currentTime.setHours(10, 0, 0, 0); // Event starts at 10:00 AM
+
+        const schedule = [];
+        let talkIndex = 0;
+
+        // Add talks and manage lunch break
+        while (talkIndex < filteredTalks.length) {
+            const talk = filteredTalks[talkIndex];
+
+            // Check if it's time for lunch (after 3 talks)
+            if (talkIndex === 3 && filteredTalks.length > 3) {
+                const lunchStartTime = new Date(currentTime.getTime());
+                schedule.push({
+                    type: 'break',
+                    title: 'Lunch Break',
+                    startTime: lunchStartTime,
+                    endTime: new Date(lunchStartTime.getTime() + (60 * 60 * 1000)), // 1 hour
+                    description: 'Enjoy a delicious lunch!',
+                    id: 'lunch-break'
+                });
+                currentTime = new Date(lunchStartTime.getTime() + (60 * 60 * 1000)); // Advance time by 1 hour for lunch
+            }
+
+            const talkStartTime = new Date(currentTime.getTime());
+            const talkEndTime = new Date(talkStartTime.getTime() + (talk.duration * 60 * 1000));
+
+            schedule.push({
+                type: 'talk',
+                ...talk,
+                startTime: talkStartTime,
+                endTime: talkEndTime
+            });
+
+            currentTime = new Date(talkEndTime.getTime());
+
+            // Add transition time if it's not the last talk
+            if (talkIndex < filteredTalks.length - 1) {
+                currentTime = new Date(currentTime.getTime() + (10 * 60 * 1000)); // Add 10 minutes transition
+            }
+            talkIndex++;
+        }
+
+        // Render schedule items
+        schedule.forEach(item => {
+            if (item.type === 'talk') {
+                const talkCard = document.createElement('div');
+                talkCard.className = 'talk-card';
+                talkCard.innerHTML = `
+                    <div class="talk-time">${formatTime(item.startTime)} - ${formatTime(item.endTime)}</div>
+                    <h2>${item.title}</h2>
+                    <div class="talk-speakers">Speaker(s): ${item.speakers.join(', ')}</div>
+                    <div class="talk-categories">Categories: ${item.category.join(', ')}</div>
+                    <p class="talk-description">${item.description}</p>
+                `;
+                scheduleContainer.appendChild(talkCard);
+            } else if (item.type === 'break') {
+                const breakCard = document.createElement('div');
+                breakCard.className = 'break-card';
+                breakCard.innerHTML = `
+                    <div class="break-time">${formatTime(item.startTime)} - ${formatTime(item.endTime)}</div>
+                    <h2>${item.title}</h2>
+                    <p class="break-description">${item.description}</p>
+                `;
+                scheduleContainer.appendChild(breakCard);
+            }
+        });
+    }
+
+    // Initial render
+    renderSchedule(talksData);
+
+    // Filter functionality
+    categoryFilter.addEventListener('change', (event) => {
+        const selectedCategory = event.target.value;
+        if (selectedCategory === 'all') {
+            renderSchedule(talksData);
+        } else {
+            const filteredTalks = talksData.filter(talk =>
+                talk.category.includes(selectedCategory)
+            );
+            renderSchedule(filteredTalks);
+        }
+    });
+});
+
+    </script>
+</body>
+</html>
